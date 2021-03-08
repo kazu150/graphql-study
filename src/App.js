@@ -36,6 +36,15 @@ class App extends Component {
     })
   }
 
+  goPrevious(search) {
+    this.setState({
+      first: null,
+      after: null,
+      last:PER_PAGE,
+      before: search.pageInfo.startCursor
+    })
+  }
+
   render(){
     const { query, first, last, before, after } = this.state;
     console.log(query)
@@ -70,6 +79,7 @@ class App extends Component {
                       )
                     })}
                   </ul>
+                  {search.pageInfo.hasPreviousPage && <button onClick={() => this.goPrevious(search)}>Previous</button>}
                   {search.pageInfo.hasNextPage && <button onClick={() => this.goNext(search)}>Next</button>}
                 </>
               )
