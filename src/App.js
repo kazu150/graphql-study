@@ -61,14 +61,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = DEFAULT_STATE;
-    this.handleChange= this.handleChange.bind(this)
-  }
-
-  handleChange(event){
-    this.setState({
-      ...DEFAULT_STATE,
-      query: event.target.value
-    })
+    this.myRef = React.createRef();
   }
 
   goNext(search) {
@@ -85,7 +78,8 @@ class App extends Component {
     return (
       <ApolloProvider client={client}>
         <form>
-          <input value={query} type="text" onChange={this.handleChange} />
+          <input ref={this.myRef} />
+          <input type="submit" value="submit" />
         </form>
         <Query 
           query={SEARCH_REPOSITORIES} 
