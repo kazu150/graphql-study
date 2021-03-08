@@ -4,6 +4,16 @@ import { Query } from 'react-apollo';
 import client from './client';
 import { SEARCH_REPOSITORIES } from './graphql';
 
+const StarButton = props => {
+  const totalCount =props.node.stargazers.totalCount;
+  const starUnit = totalCount !== 1 ? "stars" : "star";
+  return (
+    <button>
+      {totalCount} {starUnit}
+    </button>
+  )
+}
+
 const PER_PAGE = 5;
 const DEFAULT_STATE = {
   first: PER_PAGE,
@@ -33,15 +43,6 @@ class App extends Component {
       after: search.pageInfo.endCursor,
       last:null,
       before: null
-    })
-  }
-
-  goPrevious(search) {
-    this.setState({
-      first: null,
-      after: null,
-      last:PER_PAGE,
-      before: search.pageInfo.startCursor
     })
   }
 
@@ -75,11 +76,12 @@ class App extends Component {
                       return (
                         <li key={node.id}>
                           <a href={node.url} target="_blank" rel="noreferrer">{node.name}</a>
+                          &nbsp;
+                          <StarButton node={node} />
                         </li>
                       )
                     })}
                   </ul>
-                  {search.pageInfo.hasPreviousPage && <button onClick={() => this.goPrevious(search)}>Previous</button>}
                   {search.pageInfo.hasNextPage && <button onClick={() => this.goNext(search)}>Next</button>}
                 </>
               )
