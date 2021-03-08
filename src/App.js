@@ -50,6 +50,16 @@ class App extends Component {
               return (
                 <>
                   <h3>{title}</h3>
+                  <ul>
+                    {search.edges.map((edge) => {
+                      const node = edge.node
+                      return (
+                        <li key={node.id}>
+                          <a href={node.url} target="_blank">{node.name}</a>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </>
               )
             }
