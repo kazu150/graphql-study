@@ -43,8 +43,13 @@ class App extends Component {
               if(loading) return 'Loading...';
               if(error) return `Error! ${error.message}`;
               console.log(data)
+              const search = data.search;
+              const repositoryCount = search.repositoryCount;
+              const repositoryUnit = repositoryCount  !== 1 ? "Repositories": "Repository"; 
+              const title = `GitHub Repositories Search Results - ${repositoryCount} ${repositoryUnit}`
               return (
                 <>
+                  <h3>{title}</h3>
                 </>
               )
             }
