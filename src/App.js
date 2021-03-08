@@ -12,7 +12,26 @@ const StarButton = props => {
     return(
       <button onClick={() => {
         addOrRemoveStar({
-          variables: {input: { starrableId: node.id }}
+          variables: {input: { starrableId: node.id }},
+            update: (store, {data: {addStar, removeStar}}) => {
+              const { starrable } = addStar || removeStar;
+              const data = store.readQuery({
+                query: SEARCH_REPOSITORIES,
+                variables: { query, first, last, after, before}
+              })
+              const edges = data.search.edges
+              const newEdges = edges.map(edge => {
+                if(edge.node.id === node.id){
+                  const totalCount = edge.node.stargazers.totalCount;
+                  const diff = starrable.viewerHasStarred ? -1 : 1;
+                  const newTotalCount = totalCount + diff;
+                  edge.node.stargazers.totalCount = newTotalCount;
+                }
+                return edge;
+              })
+              data.search.edges = newEdges;
+              store.writeQuery({ query: SEARCH_REPOSITORIES, data})
+            }
         })
       }}>
         {totalCount} {starUnit} | {viewerHasStarred ? "starred" : "-"}
@@ -21,18 +40,7 @@ const StarButton = props => {
   }
 
   return (
-    <Mutation mutation={viewerHasStarred ? REMOVE_STAR : ADD_STAR}
-      refetchQueries={ mutationResult => {
-        console.log({mutationResult})
-        return [
-          {
-            query: SEARCH_REPOSITORIES,
-            variables: { query, first, last, before, after }
-          }
-        ]
-      }
-      }
-    >
+    <Mutation mutation={viewerHasStarred ? REMOVE_STAR : ADD_STAR} >
       {
         addOrRemoveStar => <StarStatus addOrRemoveStar={addOrRemoveStar} />
       }
@@ -74,7 +82,6 @@ class App extends Component {
 
   render(){
     const { query, first, last, before, after } = this.state;
-    console.log(query)
     return (
       <ApolloProvider client={client}>
         <form>
@@ -88,7 +95,6 @@ class App extends Component {
             ({ loading, error, data }) => {
               if(loading) return 'Loading...';
               if(error) return `Error! ${error.message}`;
-              console.log(data)
               const search = data.search;
               const repositoryCount = search.repositoryCount;
               const repositoryUnit = repositoryCount  !== 1 ? "Repositories": "Repository"; 
